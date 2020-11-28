@@ -13,7 +13,7 @@ class Post(models.Model):
     post_image = models.URLField(max_length=128)
     post_text = models.CharField(max_length=250)
     post_start_bid = models.PositiveIntegerField()
-    post_date = models.DateTimeField()
+    post_date = models.DateTimeField(default=datetime.now)
     post_end_date = models.DateField()
     post_category = models.CharField(max_length=25)
     def __str__(self): 

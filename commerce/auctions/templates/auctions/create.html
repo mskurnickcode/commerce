@@ -6,8 +6,13 @@
 
     <form action="{% url 'create' %}" method="post">
         {% csrf_token %}
-        {{form}}
-        <input class="btn btn-primary" type="submit" value="Login">
+        {% for field in form %}
+        <div>
+            <label for="{{field.name}}">{{field.label}}</label> <br>
+            {{field}}
+        </div>
+        {% endfor %}
+        <input class="btn btn-primary" type="submit" value="Post Now">
     </form>
 
 {% endblock %}

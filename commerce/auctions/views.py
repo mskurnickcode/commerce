@@ -7,7 +7,7 @@ from .models import *
 from .forms import *
 
 
-from .models import User
+from .models import *
 
 
 def index(request):
@@ -76,13 +76,27 @@ def listing(request, post_id):
 
 def create(request):
     if request.method == "POST":
-        form = PostForm(request.Post or None)
+        form = PostForm(request.POST)
         if form.is_valid():
-            form.save()
-        return index(request)
+            user_id = request.user
+            post_name = form.cleaned_data['post_name']
+            post_image = form.cleaned_data['post_image']
+            post_text = form.cleaned_data['post_text']
+            post_start_bid = form.cleaned_data['post_start_bid']
+            post_end_date = form.cleaned_data['post_end_date']
+            post_category = form.cleaned_data['post_category']
+
+
+            post = Post(user_id= user_id, post_name= post_name, post_image= post_image, post_text=post_text, post_start_bid=post_start_bid, post_end_date=post_end_date, post_category=post_category, post_date=datetime.datetime.now())
+        print(post_name, post_category, post_end_date)
+        post.save()
+        listings = Post.objects.all()
+        return render(request, "auctions/index.html", {
+        'listings':listings
+    })
+
     
     else:
-        form = PostForm()
         return render(request, "auctions/create.html", {
-            'form': form 
+            'form': PostForm()
             })
