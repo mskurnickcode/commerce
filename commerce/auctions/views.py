@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.db.models import Max
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -70,8 +71,12 @@ def register(request):
 
 def listing(request, post_id):
     listing = Post.objects.get(id = post_id)
+    high_bid = bids.objects.filter(post_id=post_id).aggregate(Max('bid'))
     return render(request, "auctions/listing.html", {
-        "listing" : listing
+        "listing" : listing,
+        "BidForm": BidForm(),
+        "bid" : high_bid,
+        "post_id": post_id
         })
 
 def create(request):
@@ -100,3 +105,25 @@ def create(request):
         return render(request, "auctions/create.html", {
             'form': PostForm()
             })
+
+def bid(request, post_id):
+    if request.method == "POST":
+        form = BidForm(request.POST or None)
+        if form.is_valid():
+            bid = form.cleaned_data['bid']
+        
+        user_id = request.user
+        post_instance = Post.objects.get(id = post_id)
+        bid_time = datetime.now()
+        bid = bids(user_id=user_id, post_id=post_instance, bid=bid, bid_time=bid_time)
+        bid.save()
+        return listing(request, post_id)
+    else:
+        return index(request)
+
+def watchlist(request, post_id):
+        return render(request, "auctions/error.html", {
+                "message": "Feature Not Build Yet."
+            })
+
+

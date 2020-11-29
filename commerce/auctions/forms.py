@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post
+from .models import Post, bids
 from datetime import datetime
 
 item_categories = (
@@ -13,3 +13,6 @@ class PostForm (forms.Form):
     post_start_bid = forms.IntegerField(label= 'Starting Bid',min_value=0)
     post_end_date = forms.DateField(label='Set Auction End Date', widget=forms.SelectDateWidget())
     post_category = forms.ChoiceField(choices=item_categories)
+
+class BidForm (forms.Form):
+    bid = forms.IntegerField()
