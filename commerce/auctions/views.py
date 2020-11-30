@@ -72,11 +72,13 @@ def register(request):
 def listing(request, post_id):
     listing = Post.objects.get(id = post_id)
     high_bid = bids.objects.filter(post_id=post_id).aggregate(Max('bid'))
+    on_watchlist = Watchlist.objects.filter(post_id=post_id, user_id=request.user)
     return render(request, "auctions/listing.html", {
         "listing" : listing,
         "BidForm": BidForm(),
         "bid" : high_bid,
-        "post_id": post_id
+        "post_id": post_id,
+        "watchlist": on_watchlist
         })
 
 def create(request):
@@ -122,8 +124,26 @@ def bid(request, post_id):
         return index(request)
 
 def watchlist(request, post_id):
-        return render(request, "auctions/error.html", {
-                "message": "Feature Not Build Yet."
-            })
+    user_id = request.user
+    post_instance = Post.objects.get(id = post_id)
+    post_watched = Watchlist.objects.filter(user_id=user_id, post_id=post_instance)
+    if post_watched:
+        post_watched.delete()
+        new_get = Watchlist.objects.all()
 
 
+    else:
+        add = Watchlist(user_id=user_id, post_id=post_instance, watch_current=True)
+        add.save()
+        new_get = Watchlist.objects.all()
+
+    listing = Post.objects.get(id = post_id)
+    high_bid = bids.objects.filter(post_id=post_id).aggregate(Max('bid'))
+    on_watchlist = Watchlist.objects.filter(post_id=post_id, user_id=request.user)
+    return render(request, "auctions/listing.html", {
+        "listing" : listing,
+        "BidForm": BidForm(),
+        "bid" : high_bid,
+        "post_id": post_id,
+        "watchlist": on_watchlist
+        })

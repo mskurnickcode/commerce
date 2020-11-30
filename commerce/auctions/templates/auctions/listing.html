@@ -15,17 +15,25 @@
                         <div class="card-body">
                             <h6>Auction Started: {{listing.post_date}}</h6>
                             <h6>Auction will end on: {{listing.post_end_date}}</h6>
-                            <h6>Initial Bid: ${{listing.post_start_bid}}/
-                                Current Bid: ${{bid.bid__max}}</h6>
+                            <h6>Initial Bid: ${{listing.post_start_bid}} / Current Bid: 
+                                {% if bid.bid__max == None %}
+                                Be First Bid
+                                {% else %}
+                                ${{bid.bid__max}}</h6>
+                                {% endif %}
                                 <form action="{% url 'bid' post_id %}" method="post">
                                     {% csrf_token %}
-                                        <div class="row" style="padding-left: 10%; justify-content: space-evenly;">
+                                        <div class="row" style="padding-left: 10%; justify-content:space-evenly">
                                             <h6>{{BidForm}}</h6>
                                             <input class="btn btn-primary btn-sm" type="submit" value="Bid Now" style="height: 100%; vertical-align: text-top;">
                                         </div>
                                 </form>
                             <h6>{{listing.post_text}}</h6>
-                            <a href="{% url 'watchlist' post_id %}" type="button" class="btn btn-success">Add to Watchlist</a>        
+                            {% if not watchlist %}
+                            <a href="{% url 'watchlist' post_id %}" type="button" class="btn btn-success">Add to Watchlist</a> 
+                            {% else %}
+                            <a href="{% url 'watchlist' post_id %}" type="button" class="btn btn-danger">Remove from Watchlist</a> 
+                            {% endif %}
                         </div>
                     </div>
             </div>
