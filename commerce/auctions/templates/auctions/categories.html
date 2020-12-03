@@ -1,0 +1,26 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="containter">
+        <div class="row">
+            <div class="col">
+                <h2 style="text-align: center;" >{{category}} Listings</h2>
+                {% for post in categoryListings|slice:":8" %}
+                <div class="card mb-3" style="max-width: 75%; max-height: 200px; margin-left: 10%" >
+                    <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <img src="{{post.post_image}}" class="card-img" alt="{{post.post_name}}" style="max-width: 150px; max-height: 100px;">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body" style="justify-content: center;">
+                        <h5 class="card-title" style="text-align: center;"><a href="listing/{{post.id}}">{{ post.post_name }} </a></h5>
+                        <p class="card-text">{{post.post_text}}</p>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

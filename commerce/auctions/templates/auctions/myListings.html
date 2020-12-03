@@ -1,0 +1,27 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>My Listings</h2>
+
+
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Listing Name</th>
+            <th scope="col">Auction Start Date</th>
+            <th scope="col">Auction End Date</th>
+            <th scope="col">Initial/Current Price</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for post in myListings %}
+          <tr>
+            <th scope="row"><a href="listing/{{post.id}}">{{ post.post_name }}</a></th>
+            <td>{{ post.post_date }}</td>
+            <td>{{post.post_end_date}}</td>
+            <td>${{post.post_start_bid}} / ${{ post.bid_now }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+{% endblock %}

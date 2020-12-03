@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.db.models import Max
+from django.db.models import Max, Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -13,8 +13,12 @@ from .models import *
 
 def index(request):
     listings = Post.objects.all()
+    categories = Post.objects.values('post_category').annotate(categoryCount=Count('post_name'))
+    
+    print(categories)
     return render(request, "auctions/index.html", {
-        'listings':listings
+        'listings':listings,
+        'item_categories':item_categories
     })
 
 
@@ -94,7 +98,7 @@ def create(request):
             post_category = form.cleaned_data['post_category']
 
 
-            post = Post(user_id= user_id, post_name= post_name, post_image= post_image, post_text=post_text, post_start_bid=post_start_bid, post_end_date=post_end_date, post_category=post_category, post_date=datetime.datetime.now())
+            post = Post(user_id= user_id, post_name= post_name, post_image= post_image, post_text=post_text, post_start_bid=post_start_bid, post_end_date=post_end_date, post_category=post_category, post_date=datetime.now())
         print(post_name, post_category, post_end_date)
         post.save()
         listings = Post.objects.all()
@@ -147,3 +151,48 @@ def watchlist(request, post_id):
         "post_id": post_id,
         "watchlist": on_watchlist
         })
+
+def myListings(request):
+    user_id = request.user
+    myListings = Post.objects.filter(user_id= user_id)
+    high_bids = []
+    print(myListings)
+    for listing in myListings:
+        current_bid = bids.objects.filter(post_id=listing.id).aggregate(Max('bid'))
+        listing.bid_now = current_bid['bid__max']
+    return render(request, "auctions/myListings.html",{
+        "myListings":myListings,
+    })
+
+
+def myBiddings(request):
+    user_id = request.user
+
+    highBids = bids.objects.values('post_id').annotate(high_bid = Max('bid')).filter(user_id=user_id)
+    highBidsList = list(highBids)
+    for listing in highBidsList:
+        post = Post.objects.get(id = listing['post_id'])
+        high_bid = bids.objects.filter(post_id=listing['post_id']).aggregate(Max('bid'))
+        listing['post_name']= post.post_name
+        listing['post_end_date']= post.post_end_date
+        listing['all_bids'] = high_bid
+    print(highBidsList)
+    return render(request, "auctions/myBiddings.html", {
+        "myBiddings":highBids
+
+    })
+
+def category(request, category):
+    category_id = None
+    for x in range (0, len(item_categories)):
+        print(item_categories[x])
+        if item_categories[x][1] == category:
+            category_id = x
+            break
+
+    categoryListings = Post.objects.filter(post_category=category_id)
+    return render(request, "auctions/categories.html", {
+        "category":category,
+        "categoryListings":categoryListings,
+        "BidForm":BidForm()
+    })
