@@ -15,7 +15,7 @@
         <tbody>
         {% for post in myBiddings %}
           <tr>
-            <th scope="row"><a href="listing/{{post.id}}">{{ post.post_name }}</a></th>
+            <th scope="row"><a href="listing/{{post.post_id}}">{{ post.post_name }}</a></th>
             <td>{{post.post_end_date}}</td>
             <td> ${{post.high_bid}} / ${{post.all_bids.bid__max}} </td>
           </tr>

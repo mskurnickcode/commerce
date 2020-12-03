@@ -6,13 +6,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from .models import *
 from .forms import *
-
-
-from .models import *
+from datetime import date
+import random
 
 
 def index(request):
-    listings = Post.objects.all()
+    today = datetime.today()
+    listings = Post.objects.filter(post_end_date__gt=today)
     categories = Post.objects.values('post_category').annotate(categoryCount=Count('post_name'))
     
     print(categories)
